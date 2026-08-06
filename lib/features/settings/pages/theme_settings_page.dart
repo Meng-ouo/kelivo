@@ -4,10 +4,12 @@ import 'package:provider/provider.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../icons/lucide_adapter.dart';
 import '../../../theme/palettes.dart';
+import '../../../theme/custom_theme_store.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/ios_switch.dart';
 import '../../../core/services/haptics.dart';
 import 'package:Kelivo/theme/app_font_weights.dart';
+import 'custom_theme_editor_page.dart';
 
 class ThemeSettingsPage extends StatelessWidget {
   const ThemeSettingsPage({super.key});
@@ -75,6 +77,46 @@ class ThemeSettingsPage extends StatelessWidget {
                 value: settings.usePureBackground,
                 onChanged: (v) =>
                     context.read<SettingsProvider>().setUsePureBackground(v),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // 自定义主题入口
+          _iosSectionCard(
+            children: [
+              _TactileRow(
+                onTap: () {
+                  Haptics.soft();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const CustomThemeEditorPage(),
+                    ),
+                  );
+                },
+                builder: (pressed) {
+                  final baseColor = cs.onSurface.withValues(alpha: 0.9);
+                  return _AnimatedPressColor(
+                    pressed: pressed,
+                    base: baseColor,
+                    builder: (c) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          Icon(Lucide.Palette, size: 20, color: cs.primary),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text('自定义主题',
+                                style: TextStyle(fontSize: 15, color: c)),
+                          ),
+                          Icon(Lucide.ChevronRight,
+                              size: 18,
+                              color: cs.onSurface.withValues(alpha: 0.3)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

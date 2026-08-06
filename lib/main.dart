@@ -16,6 +16,8 @@ import 'desktop/desktop_tray_controller.dart';
 // Theme is now managed in SettingsProvider
 import 'theme/theme_factory.dart';
 import 'theme/palettes.dart';
+import 'theme/custom_theme.dart';
+import 'theme/custom_theme_store.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'core/providers/user_provider.dart';
@@ -601,6 +603,7 @@ class MyApp extends StatelessWidget {
             initialConfig: ctx.read<SettingsProvider>().s3Config,
           ),
         ),
+        ChangeNotifierProvider(create: (_) => CustomThemeStore()),
       ],
       child: Builder(
         builder: (context) {
@@ -725,16 +728,30 @@ class MyApp extends StatelessWidget {
               final useDyn = isAndroid && settings.useDynamicColor;
               final palette = ThemePalettes.byId(settings.themePaletteId);
 
-              final light = buildLightThemeForScheme(
-                palette.light,
-                dynamicScheme: useDyn ? lightDynamic : null,
-                pureBackground: settings.usePureBackground,
-              );
-              final dark = buildDarkThemeForScheme(
-                palette.dark,
-                dynamicScheme: useDyn ? darkDynamic : null,
-                pureBackground: settings.usePureBackground,
-              );
+              // 自定义主题优先
+              final customStore = context.watch<CustomThemeStore>();
+              final customTheme = customStore.currentTheme;
+
+              final light = customTheme != null
+                  ? buildLightThemeForScheme(
+                      customTheme.toLightColorScheme(),
+                      pureBackground: settings.usePureBackground,
+                    )
+                  : buildLightThemeForScheme(
+                      palette.light,
+                      dynamicScheme: useDyn ? lightDynamic : null,
+                      pureBackground: settings.usePureBackground,
+                    );
+              final dark = customTheme != null
+                  ? buildDarkThemeForScheme(
+                      customTheme.toDarkColorScheme(),
+                      pureBackground: settings.usePureBackground,
+                    )
+                  : buildDarkThemeForScheme(
+                      palette.dark,
+                      dynamicScheme: useDyn ? darkDynamic : null,
+                      pureBackground: settings.usePureBackground,
+                    );
               // Resolve effective app font family (system/Google/local alias)
               String? effectiveAppFontFamily() {
                 final fam = settings.appFontFamily;
