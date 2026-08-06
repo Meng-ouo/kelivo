@@ -19,6 +19,7 @@ import 'theme/palettes.dart';
 import 'theme/custom_theme.dart';
 import 'theme/custom_theme_store.dart';
 import 'features/ble/ble_config_store.dart';
+import 'features/ble/ble_manager.dart';
 import 'features/server/server_config_store.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -566,6 +567,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(create: (_) => UpdateProvider()),
         ChangeNotifierProvider(create: (_) => BleConfigStore()),
+        ChangeNotifierProvider(create: (_) => BleManager()),
         ChangeNotifierProvider(create: (_) => ServerConfigStore()),
         ChangeNotifierProvider(
           create: (_) => QuickPhraseProvider(preferences: businessPreferences),
