@@ -34,6 +34,8 @@ class CustomTheme {
       name: name,
       light: light ?? CustomColorScheme.creamBerryLight(),
       dark: dark ?? CustomColorScheme.creamBerryDark(),
+      createdAt: now,
+      updatedAt: now,
     );
   }
 
