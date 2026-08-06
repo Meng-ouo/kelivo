@@ -14,16 +14,14 @@
 4. [~] 主题系统 — 抄 Polaris 分层+试穿思路（写了模型+存储+编辑器，还没接入主程序）
 
 ## 主题系统进度
-- [x] `lib/theme/custom_theme.dart` — CustomTheme 模型 + CustomColorScheme（序列化/反序列化/toColorScheme）
-- [x] `lib/theme/custom_theme_store.dart` — 主题存储（增删改查/试穿/落库/导入导出）
-- [x] `lib/features/settings/pages/custom_theme_editor_page.dart` — 主题编辑器页面（HSV 颜色选择器 + 实时预览 + 试穿/确认）
+- [x] `lib/theme/custom_theme.dart` — CustomTheme 模型 + CustomColorScheme
+- [x] `lib/theme/custom_theme_store.dart` — 主题存储（增删改查/试穿/落库/导入导出/clearActive）
+- [x] `lib/features/settings/pages/custom_theme_editor_page.dart` — 主题编辑器（HSV 滑杆 + 实时预览 + 试穿/确认）
 - [x] `lib/theme/palettes.dart` — 加了奶霜莓粉色板 cream_berry
 - [x] `lib/core/providers/settings_provider.dart` — 默认色板改成 cream_berry
-- [ ] **联动：SettingsProvider 加 setCustomTheme 方法**（让主题编辑器能应用自定义主题到全局）
-- [ ] **联动：theme_factory.dart 加 buildThemeFromCustom 方法**（从 CustomTheme 构建 ThemeData）
-- [ ] **联动：theme_settings_page.dart 加入"自定义主题"入口**（跳转到编辑器页面）
-- [ ] **联动：main.dart 或 app.dart 注册 CustomThemeStore 到 Provider**（让编辑器能 context.read）
-- [ ] **联动：app.dart 的 ThemeData 构建逻辑加自定义主题分支**（当前用的是 paletteId 走 ThemePalettes，需要加 custom 分支）
+- [x] `lib/main.dart` — 加 import + CustomThemeStore Provider + 主题构建逻辑加自定义主题分支
+- [x] `lib/features/settings/pages/theme_settings_page.dart` — 加自定义主题入口
+- [~] **第二波 CI 编译中** — 等结果确认主题系统无语法错误
 
 ## 其他还没做
 - [ ] BLE 模块（pubspec.yaml 加 flutter_blue_plus + lib/features/ble/ 目录）

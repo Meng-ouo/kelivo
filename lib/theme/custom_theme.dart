@@ -290,8 +290,8 @@ class CustomColorScheme {
   }
 
   CustomColorScheme copyWithColor(String key, int value) {
-    final m = Map<String, int>.from(toJson());
+    final m = <String, dynamic>{...toJson()};
     m[key] = value;
-    return CustomColorScheme.fromJson(m.map((k, v) => MapEntry(k, v)));
+    return CustomColorScheme.fromJson(m);
   }
 }
