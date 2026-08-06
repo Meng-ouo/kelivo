@@ -192,4 +192,6 @@ class Lucide {
   static const IconData clock = lucide.LucideIcons.clock;
   static const IconData Wallet = lucide.LucideIcons.walletMinimal;
   static const IconData Coins = lucide.LucideIcons.coins;
+  static const IconData Bluetooth = lucide.LucideIcons.bluetooth;
+  static const IconData Server = lucide.LucideIcons.server;
 }
