@@ -348,7 +348,7 @@ class SettingsProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
   // Theme palette & dynamic color
-  String _themePaletteId = 'default';
+  String _themePaletteId = 'cream_berry';
   String get themePaletteId => _themePaletteId;
   bool _useDynamicColor = true; // when supported on Android
   bool get useDynamicColor => _useDynamicColor;
@@ -605,7 +605,7 @@ class SettingsProvider extends ChangeNotifier {
       default:
         _themeMode = ThemeMode.system;
     }
-    _themePaletteId = prefs.getString(_themePaletteKey) ?? 'default';
+    _themePaletteId = prefs.getString(_themePaletteKey) ?? 'cream_berry';
     _useDynamicColor = prefs.getBool(_useDynamicColorKey) ?? true;
     final cfgStr = prefs.getString(_providerConfigsKey);
     if (cfgStr != null && cfgStr.isNotEmpty) {
