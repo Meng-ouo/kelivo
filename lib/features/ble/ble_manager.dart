@@ -35,6 +35,8 @@ class BleManager extends ChangeNotifier {
   StreamSubscription<List<int>>? _notifySub;
   Timer? _reconnectTimer;
   Timer? _scanTimeout;
+  Timer? _keepAliveTimer;
+  List<int> _lastCommand = [];
   String? _error;
 
   /// 当前状态
@@ -157,10 +159,24 @@ class BleManager extends ChangeNotifier {
     }
   }
 
-  /// 发送指令（带重发）。
+  /// 发送指令（带重发 + 新命令取消旧保活）。
   /// 返回是否至少成功一次。
   Future<bool> sendCommand(List<int> data) async {
     if (!isConnected || _writeChar == null) return false;
+    // 新命令取消旧的保活
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = null;
+
+    final ok = await _writeData(data);
+    if (ok) {
+      _lastCommand = data;
+      _startKeepAlive();
+    }
+    return ok;
+  }
+
+  /// 底层写数据（带重发）
+  Future<bool> _writeData(List<int> data) async {
     final withoutResponse = _config?.writeMethod == 'withoutResponse';
     for (int i = 0; i < (_config?.retryCount ?? 3); i++) {
       try {
@@ -171,6 +187,49 @@ class BleManager extends ChangeNotifier {
       }
     }
     return false;
+  }
+
+  /// 保活循环——定期重发最后一条命令（保持设备持续工作）
+  void _startKeepAlive() {
+    final interval = _config?.keepAliveInterval ?? 0;
+    if (interval <= 0 || _lastCommand.isEmpty) return;
+    _keepAliveTimer = Timer.periodic(
+      Duration(milliseconds: interval),
+      (_) {
+        if (isConnected) {
+          _writeData(_lastCommand);
+        } else {
+          _keepAliveTimer?.cancel();
+        }
+      },
+    );
+  }
+
+  /// 立刻停止——取消保活 + 发停止包（从配置的 stopData 解析）
+  Future<void> stop() async {
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = null;
+    _lastCommand = [];
+    final stopHex = _config?.stopData ?? '';
+    if (stopHex.isNotEmpty && isConnected && _writeChar != null) {
+      final stopBytes = _parseHex(stopHex);
+      if (stopBytes.isNotEmpty) {
+        await _writeData(stopBytes);
+      }
+    }
+  }
+
+  /// 解析 hex 字符串为 bytes
+  List<int> _parseHex(String hex) {
+    final clean = hex.replaceAll(RegExp(r'[\s,]'), '');
+    if (clean.length % 2 != 0) return [];
+    final bytes = <int>[];
+    for (int i = 0; i < clean.length; i += 2) {
+      final b = int.tryParse(clean.substring(i, i + 2), radix: 16);
+      if (b == null) return [];
+      bytes.add(b);
+    }
+    return bytes;
   }
 
   /// 断线重连
@@ -195,6 +254,7 @@ class BleManager extends ChangeNotifier {
 
   /// 主动断开
   Future<void> disconnect() async {
+    await stop();
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
     if (_device != null) {
@@ -217,6 +277,9 @@ class BleManager extends ChangeNotifier {
     _scanTimeout = null;
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = null;
+    _lastCommand = [];
     _writeChar = null;
     _notifyChar = null;
     _device = null;

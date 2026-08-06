@@ -21,6 +21,7 @@ import 'theme/custom_theme_store.dart';
 import 'features/ble/ble_config_store.dart';
 import 'features/ble/ble_manager.dart';
 import 'features/server/server_config_store.dart';
+import 'features/server/toy_api_service.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'core/providers/user_provider.dart';
@@ -569,6 +570,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BleConfigStore()),
         ChangeNotifierProvider(create: (_) => BleManager()),
         ChangeNotifierProvider(create: (_) => ServerConfigStore()),
+        ChangeNotifierProvider(create: (_) => ToyApiService()),
         ChangeNotifierProvider(
           create: (_) => QuickPhraseProvider(preferences: businessPreferences),
         ),

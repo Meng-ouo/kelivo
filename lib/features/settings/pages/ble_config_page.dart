@@ -142,6 +142,8 @@ class _BleConfigEditPageState extends State<BleConfigEditPage> {
   late final TextEditingController _reconnectCtl;
   late final TextEditingController _retryCtl;
   late final TextEditingController _timeoutCtl;
+  late final TextEditingController _keepAliveCtl;
+  late final TextEditingController _stopDataCtl;
   late String _writeMethod;
 
   @override
@@ -157,6 +159,9 @@ class _BleConfigEditPageState extends State<BleConfigEditPage> {
     _retryCtl = TextEditingController(text: (c?.retryCount ?? 3).toString());
     _timeoutCtl =
         TextEditingController(text: (c?.connectTimeout ?? 10).toString());
+    _keepAliveCtl = TextEditingController(
+        text: (c?.keepAliveInterval ?? 0).toString());
+    _stopDataCtl = TextEditingController(text: c?.stopData ?? '');
     _writeMethod = c?.writeMethod ?? 'withoutResponse';
   }
 
@@ -169,6 +174,8 @@ class _BleConfigEditPageState extends State<BleConfigEditPage> {
     _reconnectCtl.dispose();
     _retryCtl.dispose();
     _timeoutCtl.dispose();
+    _keepAliveCtl.dispose();
+    _stopDataCtl.dispose();
     super.dispose();
   }
 
@@ -193,6 +200,8 @@ class _BleConfigEditPageState extends State<BleConfigEditPage> {
       reconnectInterval: int.tryParse(_reconnectCtl.text) ?? 3,
       retryCount: int.tryParse(_retryCtl.text) ?? 3,
       connectTimeout: int.tryParse(_timeoutCtl.text) ?? 10,
+      keepAliveInterval: int.tryParse(_keepAliveCtl.text) ?? 0,
+      stopData: _stopDataCtl.text.trim(),
     );
     if (widget.config == null) {
       // 新增
@@ -205,6 +214,8 @@ class _BleConfigEditPageState extends State<BleConfigEditPage> {
         reconnectInterval: config.reconnectInterval,
         retryCount: config.retryCount,
         connectTimeout: config.connectTimeout,
+        keepAliveInterval: config.keepAliveInterval,
+        stopData: config.stopData,
       );
       await store.setActive(added.id);
     } else {
@@ -248,6 +259,8 @@ class _BleConfigEditPageState extends State<BleConfigEditPage> {
           _field('重连间隔（秒）', _reconnectCtl, '断线后多久重连'),
           _field('重发次数', _retryCtl, '单条指令重发几次'),
           _field('连接超时（秒）', _timeoutCtl, '连接多久算超时'),
+          _field('保活重发间隔（毫秒）', _keepAliveCtl, '0=不保活，谜姬类设备填 200'),
+          _field('停止指令 hex（可选）', _stopDataCtl, '停止时发的原始字节，如 0312f3...'),
           const SizedBox(height: 24),
           if (widget.config != null)
             FilledButton.tonalIcon(

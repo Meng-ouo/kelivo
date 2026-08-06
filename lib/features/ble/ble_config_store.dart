@@ -16,6 +16,8 @@ class BleDeviceConfig {
   final int reconnectInterval; // 断线重连间隔（秒）
   final int retryCount; // 单条指令重发次数
   final int connectTimeout; // 连接超时（秒）
+  final int keepAliveInterval; // 保活重发间隔（毫秒，0=不保活）
+  final String stopData; // 停止指令 hex（用户自填，空=不发包直接停保活）
 
   BleDeviceConfig({
     required this.id,
@@ -27,6 +29,8 @@ class BleDeviceConfig {
     this.reconnectInterval = 3,
     this.retryCount = 3,
     this.connectTimeout = 10,
+    this.keepAliveInterval = 0,
+    this.stopData = '',
   });
 
   Map<String, dynamic> toJson() => {
@@ -39,6 +43,8 @@ class BleDeviceConfig {
         'reconnectInterval': reconnectInterval,
         'retryCount': retryCount,
         'connectTimeout': connectTimeout,
+        'keepAliveInterval': keepAliveInterval,
+        'stopData': stopData,
       };
 
   factory BleDeviceConfig.fromJson(Map<String, dynamic> json) {
@@ -52,6 +58,8 @@ class BleDeviceConfig {
       reconnectInterval: json['reconnectInterval'] as int? ?? 3,
       retryCount: json['retryCount'] as int? ?? 3,
       connectTimeout: json['connectTimeout'] as int? ?? 10,
+      keepAliveInterval: json['keepAliveInterval'] as int? ?? 0,
+      stopData: json['stopData'] as String? ?? '',
     );
   }
 
@@ -64,6 +72,8 @@ class BleDeviceConfig {
     int? reconnectInterval,
     int? retryCount,
     int? connectTimeout,
+    int? keepAliveInterval,
+    String? stopData,
   }) {
     return BleDeviceConfig(
       id: id,
@@ -75,6 +85,8 @@ class BleDeviceConfig {
       reconnectInterval: reconnectInterval ?? this.reconnectInterval,
       retryCount: retryCount ?? this.retryCount,
       connectTimeout: connectTimeout ?? this.connectTimeout,
+      keepAliveInterval: keepAliveInterval ?? this.keepAliveInterval,
+      stopData: stopData ?? this.stopData,
     );
   }
 }
@@ -136,6 +148,8 @@ class BleConfigStore extends ChangeNotifier {
     int reconnectInterval = 3,
     int retryCount = 3,
     int connectTimeout = 10,
+    int keepAliveInterval = 0,
+    String stopData = '',
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     final config = BleDeviceConfig(
@@ -148,6 +162,8 @@ class BleConfigStore extends ChangeNotifier {
       reconnectInterval: reconnectInterval,
       retryCount: retryCount,
       connectTimeout: connectTimeout,
+      keepAliveInterval: keepAliveInterval,
+      stopData: stopData,
     );
     _configs.add(config);
     await _persist();
